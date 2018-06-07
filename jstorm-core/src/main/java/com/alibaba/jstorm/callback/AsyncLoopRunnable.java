@@ -34,7 +34,7 @@ import com.alibaba.jstorm.utils.JStormUtils;
 public class AsyncLoopRunnable implements Runnable {
     private static Logger LOG = LoggerFactory.getLogger(AsyncLoopRunnable.class);
 
-    // set shutdown as false is to
+    // set shutdown as false is to   原子布尔变量:记录关闭命令和记录已关闭状态
     private static AtomicBoolean shutdown = new AtomicBoolean(false);
     private AtomicBoolean shutdowned = new AtomicBoolean(false);
 

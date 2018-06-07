@@ -78,7 +78,10 @@ import static com.alibaba.jstorm.schedule.Assignment.AssignmentType;
 public class WorkerData {
     private static Logger LOG = LoggerFactory.getLogger(WorkerData.class);
 
+    //线程池中任务的个数
     public static final int THREAD_POOL_NUM = 4;
+
+    //线程池，调度定时任务
     private ScheduledExecutorService threadPool;
 
     // system configuration
@@ -88,42 +91,46 @@ public class WorkerData {
 
     private Map<Object, Object> stormConf;
 
-    // message queue
+    // message queue  消息上下文对象，从外界获取消息的接口
     private IContext context;
 
     private final String topologyId;
     private final String supervisorId;
+    //开放给外界用来通信的端口
     private final Integer port;
     private final String workerId;
     // worker status :active/shutdown
+    //跟踪和控制Worker的运行状态   停止/监控
     private AtomicBoolean shutdown;
     private AtomicBoolean monitorEnable;
 
     // Topology status
     private StatusType topologyStatus;
 
-    // ZK interface
+    // ZK interface  集群在zk中的记录状态
     private ClusterState zkClusterState;
     private StormClusterState zkCluster;
 
-    // running taskId list in current worker
+    // running taskId list in current worker  当前Worker上运行的task编号
     private Set<Integer> taskIds;
 
     // connection to other workers <NodePort, ZMQConnection>
+    // 管理与其他work的连接对象
     private ConcurrentHashMap<WorkerSlot, IConnection> nodePortToSocket;
     // <taskId, NodePort>
     private ConcurrentHashMap<Integer, WorkerSlot> taskToNodePort;
 
     private ConcurrentSkipListSet<ResourceWorkerSlot> workerToResource;
-
+    // 需要向外部输出信息的Task集合
     private volatile Set<Integer> outboundTasks;
+    // 本地节点上的Task集合
     private Set<Integer> localNodeTasks = new HashSet<>();
 
     private ConcurrentHashMap<Integer, DisruptorQueue> innerTaskTransfer;
     private ConcurrentHashMap<Integer, DisruptorQueue> controlQueues;
     private ConcurrentHashMap<Integer, DisruptorQueue> deserializeQueues;
 
-    // <taskId, component>
+    // <taskId, component>  Component上运行的task
     private ConcurrentHashMap<Integer, String> tasksToComponent;
     private ConcurrentHashMap<String, List<Integer>> componentToSortedTasks;
 
@@ -133,13 +140,15 @@ public class WorkerData {
     private Map registeredMetrics;
 
     // raw topology is deserialized from local jar which doesn't contain ackers
+    // 由本地的jar包反序列化而来的Topology
     private StormTopology rawTopology;
     // sys topology is the running topology in the worker which contains ackers
+    //在worker中运行的Topology
     private StormTopology sysTopology;
 
     private ContextMaker contextMaker;
 
-    // shutdown worker entrance
+    // shutdown worker entrance  关闭worker的入口
     private final AsyncLoopDefaultKill workHalt = new AsyncLoopDefaultKill();
 
     // sending tuple's queue
@@ -148,10 +157,11 @@ public class WorkerData {
 
     private List<TaskShutdownDameon> shutdownTasks;
 
+    //需要向外进行输出的任务状态
     private ConcurrentHashMap<Integer, Boolean> outTaskStatus; // true => active
 
     private FlusherPool flusherPool;
-
+    // 上次进行分配的时间
     private volatile Long assignmentTS; // assignment timeStamp. last update time of assignment
 
     private volatile AssignmentType assignmentType;
@@ -165,6 +175,7 @@ public class WorkerData {
 
     private AtomicBoolean workerInitConnectionStatus;
 
+    // Tuple序列化
     private AtomicReference<KryoTupleSerializer> atomKryoSerializer = new AtomicReference<>();
 
     private AtomicReference<KryoTupleDeserializer> atomKryoDeserializer = new AtomicReference<>();

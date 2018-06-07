@@ -47,6 +47,14 @@ public class AsyncLoopThread implements SmartThread {
         this.init(afn, daemon, priority, start);
     }
 
+    /**
+     *
+     * @param afn              RunnableCallback  需要使用线程异步循环往复执行的任务
+     * @param daemon           是否作为守护线程执行，默认为false
+     * @PARAM kill_fn          指定执行杀死任务的任务，默认值为AsyncLoopDefaultKill
+     * @param priority         线程的优先级,  默认:Thread.NORM_PRIORITY
+     * @param start            是否即刻启动该线程，默认值为true
+     */
     public AsyncLoopThread(RunnableCallback afn, boolean daemon, RunnableCallback kill_fn, int priority, boolean start) {
         this.init(afn, daemon, kill_fn, priority, start);
     }
@@ -60,13 +68,16 @@ public class AsyncLoopThread implements SmartThread {
         if (kill_fn == null) {
             kill_fn = new AsyncLoopDefaultKill();
         }
-
+        //组合任务：要执行的主任务，负责杀死主任务的任务
         Runnable runnable = new AsyncLoopRunnable(afn, kill_fn);
+
+        //给任务创建线程
         thread = new Thread(runnable);
         String threadName = afn.getThreadName();
         if (threadName == null) {
             threadName = afn.getClass().getSimpleName();
         }
+        //给线程设定相关属性：线程名，守护线程，优先级
         thread.setName(threadName);
         thread.setDaemon(daemon);
         thread.setPriority(priority);
@@ -81,6 +92,7 @@ public class AsyncLoopThread implements SmartThread {
         this.afn = afn;
 
         if (start) {
+            //立即启动该线程，执行组合任务。
             thread.start();
         }
     }

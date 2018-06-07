@@ -58,6 +58,7 @@ public class Worker {
     private static final Logger LOG = LoggerFactory.getLogger(Worker.class);
 
     /**
+     * 封装所有与Worker有关的属性
      * workerData is used to deal with racing conditions
      */
     private WorkerData workerData;
@@ -104,6 +105,7 @@ public class Worker {
         return new RefreshConnections(workerData);
     }
 
+    // 创建并开启任务
     private List<TaskShutdownDameon> createTasks() throws Exception {
         List<TaskShutdownDameon> shutdownTasks = new ArrayList<>();
 
@@ -127,6 +129,7 @@ public class Worker {
         return shutdownTasks;
     }
 
+    // 启动分发线程
     private AsyncLoopThread startDispatchThread() {
         // send tuple directly from netty server
         // send control tuple to dispatch thread
@@ -159,6 +162,7 @@ public class Worker {
         return new AsyncLoopThread(recvControlDispather, false, Thread.MAX_PRIORITY, true);
     }
 
+    // 启动Worker
     public WorkerShutdown execute() throws Exception {
         List<AsyncLoopThread> threads = new ArrayList<>();
 

@@ -18,6 +18,7 @@
 package com.alibaba.jstorm.utils;
 
 /**
+ * 定义灵活线程所必须实现的方法
  * @author yannian
  */
 public interface SmartThread {
